@@ -1,0 +1,205 @@
+#:import Factory kivy.factory.Factory
+#:import RecycleView kivy.uix.recycleview
+
+WindowManager:
+    MainMenu:
+    SetsMenu:
+    MakeNewSets:
+        id: makeNewSets
+    TeachSet:
+
+<SetsRow>:
+    cols: 4
+    size_hint_y: 0.2
+    Label:
+        id: NameLabel
+        text: root.name
+    Button:
+        id: LoadButton
+        text: "Load"
+        on_press: app.root.modfiyCSID(root.name)
+        on_release: app.root.current = "TEACHSET"
+    Button:
+        id: EditButton
+        text: "Edit"
+    Button:
+        id: DeleteButton
+        text: "Delete"
+        
+        
+<SetsView>:
+    viewclass: "SetsRow"
+    RecycleBoxLayout:
+        padding: 10
+        spacing: 10
+        default_size: None, 50
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+
+<DefinitionsRV>:
+    viewclass: "Label"
+    RecycleBoxLayout:
+        padding: 10
+        spacing: 10
+        default_size: None, 50
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+
+<MainMenu>:
+    name: "MAIN"
+
+    FloatLayout:
+        
+        Label:
+            text: "Active Recall"
+            pos_hint: {'center_x': 0.5,'center_y': 0.8}
+            font_size: 24
+
+        Label:
+            text: "Revision: 2"
+            pos_hint: {'center_x': 0.5,'center_y': 0.74}
+            font_size: 10
+
+        Button:
+            text: "Sets"
+            size_hint: 0.30, 0.05
+            pos_hint: {'center_x': 0.5,'center_y': 0.5}
+            on_press: app.root.current = "SETSMENU"
+
+<SetsMenu>:
+    
+    name: "SETSMENU"
+
+    FloatLayout:
+        
+        Label:
+            text: "Sets Menu"
+            pos_hint: {'center_x': 0.5,'center_y': 0.9}
+            font_size: 24
+
+        SetsView:
+            pos_hint: {'center_x': 0.5,'center_y': 0.5}
+            size_hint: 1, 0.6
+            id: SetsController
+
+        Button:
+            text: "Go Back"
+            size_hint: 0.30, 0.05
+            pos_hint: {'center_x': 0.5,'center_y': 0.1}
+
+            on_press: app.root.current = "MAIN"
+
+        Button:
+            text: "New Set"
+            size_hint: 0.30, 0.05
+            pos_hint: {'center_x': 0.5,'center_y': 0.15}
+
+            on_press: app.root.current = "MAKENEWSETS"
+
+<MakeDefinition@Popup>:
+    
+    size_hint: 0.9, 0.7
+    auto_dismiss: False
+    title: "Add Definition"
+    GridLayout:
+        cols: 1
+        Label:
+            text: "Word:"
+            size_hint: 1, 0.4
+
+        TextInput:
+            id: wordInput
+            name: "wordInput"
+            hint_text: "Enter Word"
+            size_hint: 1, 0.4
+
+        Label:
+            text: "Definition:"
+            size_hint: 1, 0.4
+
+        TextInput:
+            id: defInput
+            name: "defInput"
+            hint_text: "Enter Definition"
+            size_hint: 1, 0.4
+
+        GridLayout:
+            cols: 2
+            size_hint: 0.1, 0.2
+
+            Button:
+                text: "Dismiss"
+                on_release: root.dismiss()
+            Button:
+                on_press: app.root.ids.makeNewSets.ids.definitionView.AlterDefinitions(root.ids.wordInput.text, root.ids.defInput.text)
+                text: "Save Word"
+
+<MakeNewSets>:
+    name: "MAKENEWSETS"
+    id: makeNewSets
+
+    FloatLayout:
+        Label:
+            text: "Make New Sets"
+            font_size: 18
+            pos_hint: {'center_x': 0.5,'center_y': 0.95}
+        
+        Label:
+            text: "Definitions"
+            font_size: 10
+            pos_hint: {'center_x': 0.5,'center_y': 0.9}
+
+        TextInput:
+            id: SetName
+            hint_text: "Set Name"
+            pos_hint: {'center_x': 0.5,'center_y': 0.85}
+            size_hint_y: 0.06
+
+        DefinitionsRV:
+            id: definitionView
+            pos_hint: {'center_x': 0.5,'center_y': 0.5}
+            size_hint: 1, 0.6
+
+        Button:
+            text: "Save Set"
+            size_hint: 0.4, 0.05
+            pos_hint: {'center_x': 0.5,'center_y': 0.15}
+
+            on_release: app.root.saveSet(app.root.ids.makeNewSets.ids.SetName.text, app.root.ids.makeNewSets.ids.definitionView.data)
+
+        Button:
+            text: "New Definition"
+            size_hint: 0.4, 0.05
+            pos_hint: {'center_x': 0.5,'center_y': 0.10}
+
+            on_release: Factory.MakeDefinition().open()
+            
+        Button:
+            text: "Cancel"
+            size_hint: 0.4, 0.05
+            pos_hint: {'center_x': 0.5,'center_y': 0.05}
+
+            on_press: app.root.current = "SETSMENU"
+
+<TeachSet>:
+    name: "TEACHSET"
+    FloatLayout:
+        Label:
+            text: "Definition"
+            pos_hint: {'center_x': 0.5,'center_y': 0.8}
+        
+        Label:
+            id : definitionName
+            text: ""
+            pos_hint: {'center_x': 0.5,'center_y': 0.7}
+            font_size: 18
+        
+        Button:
+            text: "Another Definition"
+            on_release: root.refreshDefinition()
+            pos_hint: {'center_x': 0.5,'center_y': 0.4}
+            size_hint: 0.4, 0.05
